@@ -1,22 +1,35 @@
 /* Generated from templates/source-repo/Jenkinsfile.njk. Do not edit directly. */
 
-library identifier: 'RHTAP_Jenkins@release-v1.7.x', retriever: modernSCM(
+library identifier: 'RHTAP_Jenkins@jenkins-test-1', retriever: modernSCM(
   [$class: 'GitSCMSource',
-   remote: 'https://github.com/redhat-appstudio/tssc-sample-jenkins.git'])
+   remote: 'https://github.com/dperaza4dustbit/tssc-sample-jenkins.git'])
 
 pipeline {
-    agent any
+    agent {
+        kubernetes {
+            label 'jenkins-agent'
+            cloud 'openshift'
+            serviceAccount 'jenkins'
+            podRetention onFailure()
+            idleMinutes '30'
+            containerTemplate {
+                name 'jnlp'
+                image 'quay.io/jkopriva/rhtap-jenkins-agent:0.2'
+                ttyEnabled true
+                args '${computer.jnlpmac} ${computer.name}'
+            }
+        }
+    }
     environment {
         ROX_API_TOKEN = credentials('ROX_API_TOKEN')
+        ROX_CENTRAL_ENDPOINT = credentials('ROX_CENTRAL_ENDPOINT')
         GITOPS_AUTH_PASSWORD = credentials('GITOPS_AUTH_PASSWORD')
-        /* Set this password for your specific registry */
-        /* IMAGE_REGISTRY_PASSWORD = credentials('IMAGE_REGISTRY_PASSWORD') */
-        /* Default registry is set to quay.io */
+        /* Uncomment this when using Gitlab */
+        GITOPS_AUTH_USERNAME = credentials('GITOPS_AUTH_USERNAME')
         QUAY_IO_CREDS = credentials('QUAY_IO_CREDS')
-        /* ARTIFACTORY_IO_CREDS = credentials('ARTIFACTORY_IO_CREDS') */
-        /* NEXUS_IO_CREDS = credentials('NEXUS_IO_CREDS') */
         COSIGN_SECRET_PASSWORD = credentials('COSIGN_SECRET_PASSWORD')
         COSIGN_SECRET_KEY = credentials('COSIGN_SECRET_KEY')
+        COSIGN_PUBLIC_KEY = credentials('COSIGN_PUBLIC_KEY')
     }
     stages {
         stage('init') {
