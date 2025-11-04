@@ -1,11 +1,5 @@
 /* Generated from templates/source-repo/Jenkinsfile.njk. Do not edit directly. */
-
-library identifier: 'RHTAP_Jenkins@jenkins-test-1', retriever: modernSCM(
-  [$class: 'GitSCMSource',
-   remote: 'https://github.com/dperaza4dustbit/tssc-sample-jenkins.git'])
-
 pipeline {
-    pipeline {
     agent {
         kubernetes {
             yaml """
@@ -63,7 +57,6 @@ pipeline {
                     sh './rhtap/cosign-sign-attest.sh'
                 }
             }
-        }
-        
+        } 
     }
 }
