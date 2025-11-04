@@ -39,7 +39,7 @@ pipeline {
                 container('runner') {
                     sh 'ls -la'
                     sh 'cp -R /work/* .'
-                    sh 'ls -ls
+                    sh 'ls -la'
                     sh 'env'
                     sh 'echo running inti'
                     sh './rhtap/init.sh'
