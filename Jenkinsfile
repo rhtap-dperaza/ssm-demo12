@@ -37,8 +37,9 @@ pipeline {
         stage('init') {
             steps {
                 container('runner') {
+                    sh 'ls -la'
                     sh 'cp -R /work/* .'
-                    sh 'cp ./rhtap/env.template.sh ./rhtap/env.sh'
+                    sh 'ls -ls
                     sh 'env'
                     sh 'echo running inti'
                     sh './rhtap/init.sh'
