@@ -14,8 +14,6 @@ pipeline {
         
     }
     environment {
-        HOME='/home/jenkins/agent/workspace/davp-demo12'
-        DOCKER_CONFIG = '/home/jenkins/agent/workspace/davp-demo12/.docker'
         ROX_API_TOKEN = credentials('ROX_API_TOKEN')
         ROX_CENTRAL_ENDPOINT = credentials('ROX_CENTRAL_ENDPOINT')
         GITOPS_AUTH_PASSWORD = credentials('GITOPS_AUTH_PASSWORD')
@@ -52,6 +50,8 @@ pipeline {
         stage('build') {
             steps {
                 container('runner') {
+                    sh 'echo Home is $HOME'
+                    sh 'export DOCKER_CONFIG='$HOME/.docker'
                     sh 'cp -R /work/* .'
                     sh 'echo running bildah'
                     sh './rhtap/buildah-rhtap.sh'
