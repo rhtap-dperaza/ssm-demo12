@@ -55,6 +55,7 @@ pipeline {
                 container('runner') {
                     sh 'export HOME="$PWD"'
                     sh 'export DOCKER_CONFIG="$PWD/.docker"'
+                    sh 'git config --global --add safe.directory /home/jenkins/agent/workspace/davp-demo12'
                     sh 'cp -R /work/* .'
                     sh 'echo running bildah'
                     sh './rhtap/buildah-rhtap.sh'
