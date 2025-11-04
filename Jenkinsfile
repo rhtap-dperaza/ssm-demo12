@@ -5,20 +5,19 @@ library identifier: 'RHTAP_Jenkins@jenkins-test-1', retriever: modernSCM(
    remote: 'https://github.com/dperaza4dustbit/tssc-sample-jenkins.git'])
 
 pipeline {
+    pipeline {
     agent {
         kubernetes {
-            label 'jenkins-agent'
-            cloud 'openshift'
-            serviceAccount 'jenkins'
-            podRetention onFailure()
-            idleMinutes '30'
-            containerTemplate {
-                name 'jnlp'
-                image 'quay.io/jkopriva/rhtap-jenkins-agent:0.2'
-                ttyEnabled true
-                args '${computer.jnlpmac} ${computer.name}'
-            }
+            yaml """
+              apiVersion: v1
+              kind: Pod
+              spec:
+                containers:
+                - name: 'runner'
+                  image: 'quay.io/redhat-appstudio/rhtap-task-runner:latest'
+            """
         }
+        
     }
     environment {
         ROX_API_TOKEN = credentials('ROX_API_TOKEN')
@@ -30,60 +29,41 @@ pipeline {
         COSIGN_SECRET_PASSWORD = credentials('COSIGN_SECRET_PASSWORD')
         COSIGN_SECRET_KEY = credentials('COSIGN_SECRET_KEY')
         COSIGN_PUBLIC_KEY = credentials('COSIGN_PUBLIC_KEY')
+        IMAGE_REGISTRY_USER = credentials('IMAGE_REGISTRY_USER')
+        IMAGE_REGISTRY_PASSWORD = credentials('IMAGE_REGISTRY_PASSWORD')
+        TUF_MIRROR = credentials('TUF_MIRROR')
+        REKOR_HOST = credentials('REKOR_HOST')
+        TRUSTIFICATION_BOMBASTIC_API_URL = credentials('TRUSTIFICATION_BOMBASTIC_API_URL')
+        TRUSTIFICATION_OIDC_ISSUER_URL = credentials('TRUSTIFICATION_OIDC_ISSUER_URL')
+        TRUSTIFICATION_OIDC_CLIENT_ID = credentials('TRUSTIFICATION_OIDC_CLIENT_ID')
+        TRUSTIFICATION_OIDC_CLIENT_SECRET = credentials('TRUSTIFICATION_OIDC_CLIENT_SECRET')
+        TRUSTIFICATION_SUPPORTED_CYCLONEDX_VERSION = credentials('TRUSTIFICATION_SUPPORTED_CYCLONEDX_VERSION')
     }
     stages {
         stage('init') {
             steps {
-                script {
-                    rhtap.info('init')
-                    rhtap.init()
+                container('runner') {
+                    sh 'cp -R /work/* .'
+                    sh 'cp ./rhtap/env.template.sh ./rhtap/env.sh'
+                    sh 'env'
+                    sh 'echo running inti'
+                    sh './rhtap/init.sh'
                 }
             }
         }
 
         stage('build') {
             steps {
-                script {
-                    rhtap.info('buildah_rhtap')
-                    rhtap.buildah_rhtap()
-                    rhtap.info('cosign_sign_attest')
-                    rhtap.cosign_sign_attest()
+                container('runner') {
+                    sh 'cp -R /work/* .'
+                    sh 'cp ./rhtap/env.template.sh ./rhtap/env.sh'
+                    sh 'echo running bildah'
+                    sh './rhtap/buildah-rhtap.sh'
+                    sh 'echo running attestation'
+                    sh './rhtap/cosign-sign-attest.sh'
                 }
             }
         }
-
-        stage('deploy') {
-            steps {
-                script {
-                    rhtap.info('update_deployment')
-                    rhtap.update_deployment()
-                }
-            }
-        }
-
-        stage('scan') {
-            steps {
-                script {
-                    rhtap.info('acs_deploy_check')
-                    rhtap.acs_deploy_check()
-                    rhtap.info('acs_image_check')
-                    rhtap.acs_image_check()
-                    rhtap.info('acs_image_scan')
-                    rhtap.acs_image_scan()
-                }
-            }
-        }
-
-        stage('summary') {
-            steps {
-                script {
-                    rhtap.info('show_sbom_rhdh')
-                    rhtap.show_sbom_rhdh()
-                    rhtap.info('summary')
-                    rhtap.summary()
-                }
-            }
-        }
-
+        
     }
 }
