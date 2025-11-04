@@ -37,9 +37,9 @@ pipeline {
         stage('init') {
             steps {
                 container('runner') {
-                    sh 'ls -la'
+                    sh 'ls -la ./rhtap'
                     sh 'cp -R /work/* .'
-                    sh 'ls -la'
+                    sh 'ls -la ./rhtap'
                     sh 'env'
                     sh 'echo running inti'
                     sh './rhtap/init.sh'
@@ -51,7 +51,6 @@ pipeline {
             steps {
                 container('runner') {
                     sh 'cp -R /work/* .'
-                    sh 'cp ./rhtap/env.template.sh ./rhtap/env.sh'
                     sh 'echo running bildah'
                     sh './rhtap/buildah-rhtap.sh'
                     sh 'echo running attestation'
