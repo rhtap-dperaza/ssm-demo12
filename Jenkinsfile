@@ -51,6 +51,7 @@ pipeline {
             steps {
                 container('runner') {
                     sh 'export HOME="$PWD"'
+                    sh 'export DOCKER_CONFIG="$PWD/.docker"'
                     sh 'cp -R /work/* .'
                     sh 'echo running bildah'
                     sh './rhtap/buildah-rhtap.sh'
