@@ -15,7 +15,7 @@ pipeline {
     }
     environment {
         HOME='/home/jenkins/agent/workspace/davp-demo12'
-        DOCKER_CONFIG = '$HOME/.docker
+        DOCKER_CONFIG = '/home/jenkins/agent/workspace/davp-demo12/.docker'
         ROX_API_TOKEN = credentials('ROX_API_TOKEN')
         ROX_CENTRAL_ENDPOINT = credentials('ROX_CENTRAL_ENDPOINT')
         GITOPS_AUTH_PASSWORD = credentials('GITOPS_AUTH_PASSWORD')
