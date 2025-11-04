@@ -11,7 +11,6 @@ pipeline {
                   image: 'quay.io/redhat-appstudio/rhtap-task-runner:latest'
                   securityContext:
                     privileged: true
-                    runAsUser: 0
             """
         }
         
