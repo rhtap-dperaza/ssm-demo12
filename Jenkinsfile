@@ -40,10 +40,12 @@ pipeline {
         stage('init') {
             steps {
                 container('runner') {
-                    sh 'cp -R /work/* .'
-                    sh 'env'
-                    sh 'echo running inti'
-                    sh './rhtap/init.sh'
+                    sh '''
+                        cp -R /work/* .
+                        env
+                        echo running init
+                        ./rhtap/init.sh
+                    '''
                 }
             }
         }
@@ -51,14 +53,13 @@ pipeline {
         stage('build') {
             steps {
                 container('runner') {
-                    sh 'git config --global --add safe.directory $WORKSPACE'
-                    sh 'ls -la ./rhtap'
-                    sh 'cp -R /work/* .'
-                    sh 'ls -la ./rhtap'
-                    sh 'echo running bildah'
-                    sh './rhtap/buildah-rhtap.sh'
-                    sh 'echo running attestation'
-                    sh './rhtap/cosign-sign-attest.sh'
+                    sh '''
+                        git config --global --add safe.directory $WORKSPACE
+                        echo running bildah
+                        ./rhtap/buildah-rhtap.sh
+                        echo running attestation
+                        ./rhtap/cosign-sign-attest.sh
+                    '''
                 }
             }
         } 
