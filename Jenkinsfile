@@ -74,5 +74,20 @@ pipeline {
                 }
             }
         }
+
+        stage('scan') {
+            steps {
+                container('runner') {
+                    sh '''
+                        echo "checking deployment"
+                        ./rhtap/acs-deploy-check.sh
+                        echo "checking image"
+                        ./rhtap/acs-image-check.sh
+                        echo "scanning image"
+                        ./rhtap/acs-image-scan.sh
+                    '''
+                }
+            }
+        }
     }
 }
