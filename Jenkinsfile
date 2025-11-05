@@ -89,5 +89,18 @@ pipeline {
                 }
             }
         }
+
+        stage('summary') {
+            steps {
+                container('runner') {
+                    sh '''
+                        echo "showing sbom"
+                        ./rhtap/show-sbom-rhdh.sh
+                        echo "Summarizing"
+                        ./rhtap/summary.sh
+                    '''
+                }
+            }
+        }
     }
 }
