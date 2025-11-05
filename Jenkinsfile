@@ -55,13 +55,24 @@ pipeline {
                 container('runner') {
                     sh '''
                         git config --global --add safe.directory $WORKSPACE
-                        echo running bildah
+                        echo "running bildah"
                         ./rhtap/buildah-rhtap.sh
-                        echo running attestation
+                        echo "running attestation"
                         ./rhtap/cosign-sign-attest.sh
                     '''
                 }
             }
-        } 
+        }
+
+        stage('deploy') {
+            steps {
+                container('runner') {
+                    sh '''
+                        echo "updating deployment"
+                        ./rhtap/update-deployment.sh
+                    '''
+                }
+            }
+        }
     }
 }
