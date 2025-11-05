@@ -16,11 +16,11 @@ pipeline {
         
     }
     environment {
-        HOME = '/home/jenkins/agent/workspace/davp-demo12'
+        HOME = "${WORKSPACE}"
+        DOCKER_CONFIG = "${WORKSPACE}/.docker"
         ROX_API_TOKEN = credentials('ROX_API_TOKEN')
         ROX_CENTRAL_ENDPOINT = credentials('ROX_CENTRAL_ENDPOINT')
         GITOPS_AUTH_PASSWORD = credentials('GITOPS_AUTH_PASSWORD')
-        /* Uncomment this when using Gitlab */
         GITOPS_AUTH_USERNAME = credentials('GITOPS_AUTH_USERNAME')
         QUAY_IO_CREDS = credentials('QUAY_IO_CREDS')
         COSIGN_SECRET_PASSWORD = credentials('COSIGN_SECRET_PASSWORD')
@@ -40,9 +40,7 @@ pipeline {
         stage('init') {
             steps {
                 container('runner') {
-                    sh 'ls -la ./rhtap'
                     sh 'cp -R /work/* .'
-                    sh 'ls -la ./rhtap'
                     sh 'env'
                     sh 'echo running inti'
                     sh './rhtap/init.sh'
@@ -53,10 +51,10 @@ pipeline {
         stage('build') {
             steps {
                 container('runner') {
-                    sh 'export HOME="$PWD"'
-                    sh 'export DOCKER_CONFIG="$PWD/.docker"'
-                    sh 'git config --global --add safe.directory /home/jenkins/agent/workspace/davp-demo12'
+                    sh 'git config --global --add safe.directory $WORKSPACE'
+                    sh 'ls -la ./rhtap'
                     sh 'cp -R /work/* .'
+                    sh 'ls -la ./rhtap'
                     sh 'echo running bildah'
                     sh './rhtap/buildah-rhtap.sh'
                     sh 'echo running attestation'
